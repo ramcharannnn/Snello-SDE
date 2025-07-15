@@ -4,7 +4,6 @@ def add_todo(item: str):
     todo_list.append(item)
     return f'Added "{item}" to your to-do list.'
 
-# Accept arbitrary args even if unused
 def list_todos(*args):
     if not todo_list:
         return "Your to-do list is empty."
