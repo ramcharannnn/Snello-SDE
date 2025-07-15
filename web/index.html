@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI To-Do Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    #chat {
+      height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #fdfdfd;
+    }
+    .user {
+      color: blue;
+      margin: 5px 0;
+    }
+    .bot {
+      color: green;
+      margin: 5px 0;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin-right: 5px;
+    }
+    button {
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🤖 AI To-Do Assistant</h2>
+    <div id="chat"></div>
+    <input type="text" id="userInput" placeholder="Type your message..." />
+    <button onclick="send()">Send</button>
+  </div>
+
+  <script>
+    const chatDiv = document.getElementById("chat");
+    const inputBox = document.getElementById("userInput");
+
+    async function send() {
+      const message = inputBox.value.trim();
+      if (!message) return;
+
+      chatDiv.innerHTML += `<div class="user"><b>You:</b> ${message}</div>`;
+      inputBox.value = "";
+
+      try {
+        const res = await fetch("http://127.0.0.1:8000/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await res.json();
+        chatDiv.innerHTML += `<div class="bot"><b>Bot:</b> ${data.response}</div>`;
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+      } catch (error) {
+        chatDiv.innerHTML += `<div class="bot" style="color:red;"><b>Bot:</b> Error connecting to server</div>`;
+      }
+
+      if (["exit", "quit"].includes(message.toLowerCase())) {
+        inputBox.disabled = true;
+        chatDiv.innerHTML += `<div style="color: red;"><b>Session closed. You can now close the tab.</b></div>`;
+      }
+    }
+
+    inputBox.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        send();
+      }
+    });
+  </script>
+</body>
+</html>
